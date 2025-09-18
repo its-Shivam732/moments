@@ -2,7 +2,9 @@ from flask import Blueprint, abort, current_app, flash, redirect, render_templat
 from flask_login import current_user, login_required
 from sqlalchemy import func, select
 from sqlalchemy.orm import with_parent
-
+from moments.ml.vision import caption_and_tags   # add this import at top
+import json
+from sqlalchemy import or_ 
 from moments.core.extensions import db
 from moments.decorators import confirm_required, permission_required
 from moments.forms.main import CommentForm, DescriptionForm, TagForm
@@ -49,7 +51,7 @@ def explore():
 
 @main_bp.route('/search')
 def search():
-    q = request.args.get('q').strip()
+    q = request.args.get('q', "").strip()
     if not q:
         flash('Enter keyword about photo, user or tag.', 'warning')
         return redirect_back()
@@ -57,16 +59,35 @@ def search():
     category = request.args.get('category', 'photo')
     page = request.args.get('page', 1, type=int)
     per_page = current_app.config['MOMENTS_SEARCH_RESULT_PER_PAGE']
-    # TODO: add SQLAlchemy 2.x support to Flask-Whooshee then update the following code
+
     if category == 'user':
         pagination = User.query.whooshee_search(q).paginate(page=page, per_page=per_page)
+        results = pagination.items
+
     elif category == 'tag':
         pagination = Tag.query.whooshee_search(q).paginate(page=page, per_page=per_page)
-    else:
-        pagination = Photo.query.whooshee_search(q).paginate(page=page, per_page=per_page)
-    results = pagination.items
-    return render_template('main/search.html', q=q, results=results, pagination=pagination, category=category)
+        results = pagination.items
 
+    else:  # default: photo
+        like = f"%{q.lower()}%"
+        pagination = (
+            Photo.query.filter(
+                or_(
+                    func.lower(func.coalesce(Photo.description, "")).like(like),
+                    func.lower(func.coalesce(Photo.ml_labels, "")) .like(like)
+                )
+            )
+            .paginate(page=page, per_page=per_page)
+        )
+        results = pagination.items
+
+    return render_template(
+        'main/search.html',
+        q=q,
+        category=category,
+        pagination=pagination,
+        results=results
+    )
 
 @main_bp.route('/notifications')
 @login_required
@@ -129,16 +150,50 @@ def upload():
         f = request.files.get('file')
         if not validate_image(f.filename):
             return 'Invalid image.', 400
+
         filename = rename_image(f.filename)
-        f.save(current_app.config['MOMENTS_UPLOAD_PATH'] / filename)
+        abs_path = current_app.config['MOMENTS_UPLOAD_PATH'] / filename
+        f.save(abs_path)
+
+        # resize versions
         filename_s = resize_image(f, filename, current_app.config['MOMENTS_PHOTO_SIZES']['small'])
         filename_m = resize_image(f, filename, current_app.config['MOMENTS_PHOTO_SIZES']['medium'])
+
+        # --- Run ML before creating Photo ---
+        try:
+            with open(abs_path, "rb") as img_f:
+                img_bytes = img_f.read()
+            auto_caption, obj_tags = caption_and_tags(img_bytes)
+        except Exception as e:
+            current_app.logger.warning("ML failed: %s", e)
+            auto_caption, obj_tags = "", []
+
+        print(auto_caption, obj_tags)
+        # --- Create photo, put caption directly into description ---
         photo = Photo(
-            filename=filename, filename_s=filename_s, filename_m=filename_m, author=current_user._get_current_object()
+            filename=filename,
+            filename_s=filename_s,
+            filename_m=filename_m,
+            author=current_user._get_current_object(),
+            description=auto_caption or None  # store ML caption as description
         )
         db.session.add(photo)
         db.session.commit()
+
+        # --- Store tags in real Tag table ---
+        for tag_name in obj_tags:
+            tag = db.session.scalar(select(Tag).filter_by(name=tag_name))
+            if tag is None:
+                tag = Tag(name=tag_name)
+                db.session.add(tag)
+                db.session.commit()
+            if tag not in photo.tags:
+                photo.tags.append(tag)
+
+        db.session.commit()
+
     return render_template('main/upload.html')
+
 
 
 @main_bp.route('/photo/<int:photo_id>')

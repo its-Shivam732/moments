@@ -292,8 +292,11 @@ class Photo(db.Model):
     can_comment: Mapped[bool] = mapped_column(default=True)
     flag: Mapped[int] = mapped_column(default=0)
 
-    author_id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'))
+    # NEW fields
+    ml_alt_text: Mapped[Optional[str]] = mapped_column(Text)   # auto alt text
+    ml_labels: Mapped[Optional[str]] = mapped_column(Text)     # JSON list of tags
 
+    author_id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'))
     author: Mapped['User'] = relationship(back_populates='photos')
     comments: WriteOnlyMapped['Comment'] = relationship(
         back_populates='photo', cascade='all, delete-orphan', passive_deletes=True
@@ -310,6 +313,10 @@ class Photo(db.Model):
     @property
     def comments_count(self):
         return db.session.scalar(select(func.count(Comment.id)).filter_by(photo_id=self.id))
+
+    # NEW helper to always get a valid alt string
+    def alt_text(self) -> str:
+        return (self.description or self.ml_alt_text or "").strip()
 
     def __repr__(self):
         return f'Photo {self.id}: {self.filename}'
