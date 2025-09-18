@@ -119,7 +119,7 @@ class User(db.Model, UserMixin):
     avatar_m: Mapped[Optional[str]] = mapped_column(String(64))
     avatar_l: Mapped[Optional[str]] = mapped_column(String(64))
     avatar_raw: Mapped[Optional[str]] = mapped_column(String(64))
-    confirmed: Mapped[bool] = mapped_column(default=False)
+    confirmed: Mapped[bool] = mapped_column(default=True)
     locked: Mapped[bool] = mapped_column(default=False)
     active: Mapped[bool] = mapped_column(default=True)
     public_collections: Mapped[bool] = mapped_column(default=True)
@@ -367,7 +367,7 @@ class Notification(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     message: Mapped[str] = mapped_column(Text)
-    is_read: Mapped[bool] = mapped_column(default=False)
+    is_read: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc), index=True)
 
     receiver_id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'))
