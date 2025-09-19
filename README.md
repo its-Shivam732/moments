@@ -20,7 +20,7 @@ $ git clone https://github.com/greyli/moments
 $ cd moments
 ```
 
-Create and activate a virtual environment:
+Create and activate a virtual environment: NOTE; I have used python version Python 3.13.7
 
 ```
 python3 -m venv .venv
