@@ -56,5 +56,6 @@ Now you can run the app:
 $flask run
 * Running on http://127.0.0.1:5000/
 ```
-Now you can try creat new account with emailid and password. After you create the account you would be able to  upload the photos. If you just want to try it out, create demo user with `flask lorem` command then run the app.
-
+1. Now you can try creat new account with emailid and password. After you create the account you would be able to  upload the photos.
+2. Click the upload button(+ symbol) in top right to add photo.
+3. After successfully uploading the photo, click the addded photo, you would see description/tag on right side.
