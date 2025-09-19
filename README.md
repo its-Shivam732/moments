@@ -49,23 +49,14 @@ To initialize the app, run the `flask init-app` command:
 $ flask init-app
 ```
 
-If you just want to try it out, generate fake data with `flask lorem` command then run the app: this will only create blank image
-
-```
-$ run flask lorem
-```
-
-It will create a test account with blank image:
-
-* email: `admin@helloflask.com`
-* password: `moments`
 
 Now you can run the app:
 
 ```
-$ pdm run flask run
+$flask run
 * Running on http://127.0.0.1:5000/
 ```
+Now you can try creat new account with emailid and password. After you create the account you would be able to  upload the photos. If you just want to try it out, create demo user with `flask lorem` command then run the app.
 
 Upload images and then click the uploaded images for description.
 ## License
