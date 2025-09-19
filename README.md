@@ -53,7 +53,7 @@ $ flask init-app
 Now you can run the app:
 
 ```
-$flask run
+$ flask run
 * Running on http://127.0.0.1:5000/
 ```
 1. Now you can try creat new account with emailid and password. After you create the account you would be able to  upload the photos.
