@@ -1,6 +1,10 @@
 # Moments
 
-A photo sharing social networking app built with Python and Flask. The example application for the book *[Python Web Development with Flask (2nd edition)](https://helloflask.com/en/book/4)* (《[Flask Web 开发实战（第 2 版）](https://helloflask.com/book/4)》).
+A photo sharing social networking app built with Python and Flask, extended with **machine learning features**.  
+In addition to the core functionality (accounts, uploads, comments, tags, collections), this version adds:
+
+- **Automatic alternative text generation** for uploaded photos (improves accessibility).  
+- **ML-powered image search** using detected objects/tags.
 
 
 ![Screenshot](dog.png)
