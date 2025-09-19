@@ -58,4 +58,4 @@ $ flask run
 ```
 1. Now you can try creat new account with emailid and password. After you create the account you would be able to  upload the photos.
 2. Click the upload button(+ symbol) in top right to add photo.
-3. After successfully uploading the photo, click the addded photo, you would see description/tag on right side.
+3. After successfully uploading the photo, click the addded photo, you would see description/tag on right side. You can also search a photo example if you uploadded dog earlier then search for dog, you would see dog.
