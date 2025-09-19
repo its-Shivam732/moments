@@ -58,8 +58,3 @@ $flask run
 ```
 Now you can try creat new account with emailid and password. After you create the account you would be able to  upload the photos. If you just want to try it out, create demo user with `flask lorem` command then run the app.
 
-Upload images and then click the uploaded images for description.
-## License
-
-This project is licensed under the MIT License (see the
-[LICENSE](LICENSE) file for details).
