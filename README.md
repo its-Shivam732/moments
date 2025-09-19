@@ -1,5 +1,7 @@
 # Moments
 
+# Demo https://uic.zoom.us/rec/share/5WfgNjCoWNX-rj8I6qE_CtEGfDA79dTA6SwaX11OhoaJ3djwwyW1HWZynGDZnf0v.ZGSwQFL_b56kO2pD
+
 A photo app built with Python and Flask, extended with **machine learning features**.  
 In addition to the core functionality (accounts, uploads, comments, tags, collections), this version adds:
 
